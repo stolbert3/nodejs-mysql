@@ -1,0 +1,4 @@
+DROP DATABASE IF EXISTS amazonHW_db;
+CREATE DATABASE amazonHW_db;
+USE amazonHW_db;
+

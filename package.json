@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/stolbert3/nodejs-mysql/issues"
   },
-  "homepage": "https://github.com/stolbert3/nodejs-mysql#readme"
+  "homepage": "https://github.com/stolbert3/nodejs-mysql#readme",
+  "dependencies": {
+    "inquirer": "^6.2.0",
+    "mysql": "^2.16.0"
+  }
 }
