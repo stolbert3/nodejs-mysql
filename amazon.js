@@ -24,7 +24,7 @@ function start() {
     inquirer
         .prompt({
             name: 'department',
-            type: 'rawlist',
+            type: 'list',
             message:
                 'Welcome! Which department would you like to shop from?',
             choices: ['CLOTHING', 'MUSIC', 'FOOD']
@@ -43,25 +43,24 @@ function start() {
 };
 
 function buyItem(chosenDepartment) {
+    var choiceArray = [];
     inquirer
         .prompt({
             name: 'items',
-            type: 'rawlist',
-            message: "Which item would you like to purchase?",
+            type: 'list',
             choices: function() {
                 connection.query('SELECT * FROM forSale', function(err, results) {
                     if (err) throw err;
-                    var choiceArray = [];
                     for (var i = 0; i < results.length; i++) {
                         if (results[i].department.toUpperCase() === chosenDepartment) {
                             choiceArray.push(results[i].item_name);
                         }
                     }
                     return choiceArray;
-                }),
-            }
-        })
-        .then(function(answer) {
+                })
+            },
+            message: "Which item would you like to purchase?"
+        }).then(function(answer) {
             var chosenItem;
             for (var i = 0; i < results.length; i++) {
                 if (results[i].item_name === answer.choice) {
