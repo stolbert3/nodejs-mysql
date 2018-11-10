@@ -19,20 +19,15 @@ connection.connect(function(err) {
 
 //--------Functions--------//
 
-var choiceArray = [];
-
-function makeArray(results) {
-    for (var i = 0; i < results.length; i++) {
-        var itemInfo = ["Name: " + results[i].item_name + " | Department: " + results[i].department + " | Price: " + results[i].price]
-        choiceArray.push(itemInfo);
-    }
-    return choiceArray;
-}
-
 function start() {
   connection.query('SELECT * FROM forSale', function(err, results) {
+    var choiceArray = [];
     if (err) throw err;
-    makeArray(results);
+    for (var i = 0; i < results.length; i++) {
+        var itemInfo = results[i].item_name
+        choiceArray.push(itemInfo);
+    }
+
     inquirer
         .prompt([
             {
@@ -42,9 +37,15 @@ function start() {
                 choices: choiceArray
             }
         ]).then(function(answer) {
-            var chosenItem = answer.toUpperCase();
-            if (results.chosenItem.inventory > 0) {
-                // bid was high enough, so update db, let the user know, and start over
+            console.log(answer);
+            var chosenItem;
+            for (var i = 0; i < results.length; i++) {
+                if (results[i].item_name === answer.choice) {
+                chosenItem = results[i];
+                }
+            }
+            if (chosenItem.inventory > 0) {
+                // item is in stock, so update inventory levels and let customer know
                 var newInventory = chosenItem.inventory - 1;
                 connection.query(
                   'UPDATE forSale SET ? WHERE ?',
@@ -60,11 +61,10 @@ function start() {
                   }
                 );
               } else {
-                // bid wasn't high enough, so apologize and start over
+                // item sold out, so apologize and start over
                 console.log('This item is sold out! Sorry!');
                 start();
               }
-            //adjust inventory levels based on what sold
         });
     });
 };
