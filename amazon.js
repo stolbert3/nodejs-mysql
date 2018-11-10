@@ -37,10 +37,9 @@ function start() {
                 choices: choiceArray
             }
         ]).then(function(answer) {
-            console.log(answer);
             var chosenItem;
             for (var i = 0; i < results.length; i++) {
-                if (results[i].item_name === answer.choice) {
+                if (results[i].item_name === answer.itemList) {
                 chosenItem = results[i];
                 }
             }
@@ -53,6 +52,9 @@ function start() {
                     {
                       inventory: newInventory
                     },
+                    {
+                      id: chosenItem.id
+                    }
                   ],
                   function(error) {
                     if (error) throw err;
