@@ -18,56 +18,32 @@ connection.connect(function(err) {
 });
 
 //--------Functions--------//
+
+var choiceArray = [];
+
+function makeArray(results) {
+    for (var i = 0; i < results.length; i++) {
+        var itemInfo = ["Name: " + results[i].item_name + " | Department: " + results[i].department + " | Price: " + results[i].price]
+        choiceArray.push(itemInfo);
+    }
+    return choiceArray;
+}
+
 function start() {
   connection.query('SELECT * FROM forSale', function(err, results) {
     if (err) throw err;
+    makeArray(results);
     inquirer
-        .prompt({
-            name: 'department',
-            type: 'list',
-            message:
-                'Welcome! Which department would you like to shop from?',
-            choices: ['CLOTHING', 'MUSIC', 'FOOD']
-        })
-        .then(function secondQuestion(answer) {
-          // based on their answer, either call the bid or the post functions
-            if (answer.department.toUpperCase() === 'CLOTHING') {
-                buyItem('CLOTHING');
-            } else if (answer.department.toUpperCase() === 'MUSIC') {
-                buyItem('MUSIC');
-            } else if (answer.department.toUpperCase() === 'FOOD') {
-                buyItem('FOOD');
+        .prompt([
+            {
+                name: 'itemList',
+                type: 'list',
+                message: 'Welcome! Which item would you like to buy?',
+                choices: choiceArray
             }
-        });
-  });
-};
-
-function buyItem(chosenDepartment) {
-    var choiceArray = [];
-    inquirer
-        .prompt({
-            name: 'items',
-            type: 'list',
-            choices: function() {
-                connection.query('SELECT * FROM forSale', function(err, results) {
-                    if (err) throw err;
-                    for (var i = 0; i < results.length; i++) {
-                        if (results[i].department.toUpperCase() === chosenDepartment) {
-                            choiceArray.push(results[i].item_name);
-                        }
-                    }
-                    return choiceArray;
-                })
-            },
-            message: "Which item would you like to purchase?"
-        }).then(function(answer) {
-            var chosenItem;
-            for (var i = 0; i < results.length; i++) {
-                if (results[i].item_name === answer.choice) {
-                chosenItem = results[i];
-                }
-            }
-            if (chosenItem.inventory > 0) {
+        ]).then(function(answer) {
+            var chosenItem = answer.toUpperCase();
+            if (results.chosenItem.inventory > 0) {
                 // bid was high enough, so update db, let the user know, and start over
                 var newInventory = chosenItem.inventory - 1;
                 connection.query(
@@ -90,4 +66,5 @@ function buyItem(chosenDepartment) {
               }
             //adjust inventory levels based on what sold
         });
-}
+    });
+};
